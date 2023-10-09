@@ -1,0 +1,14 @@
+server.port: 8080
+database:
+  url: DESKTOP-RBUHP2F
+  name: AppDb
+
+spring.profiles.active: development
+
+---
+spring.config.activate.on-profile: development
+---
+
+spring.config.activate.on-profile: debug
+server.port: 2004
+database.name: AppTestDb
