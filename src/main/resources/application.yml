@@ -1,7 +1,14 @@
 server.port: 8080
-database:
-  url: DESKTOP-RBUHP2F
-  name: AppDb
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/spring2023
+    username: postgres
+    password: 123
+  sql.init.mode: always
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 spring.profiles.active: development
 
@@ -11,4 +18,4 @@ spring.config.activate.on-profile: development
 
 spring.config.activate.on-profile: debug
 server.port: 2004
-database.name: AppTestDb
+spring.datasource.url: jdbc:postgresql://localhost:5432/spring2023Test
