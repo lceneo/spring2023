@@ -1,8 +1,7 @@
-package com.example.spring2023.Domain.Services;
+package com.example.spring2023.Application.Services;
 
 import com.example.spring2023.DAL.PostgreDb;
 import com.example.spring2023.Domain.models.Actor;
-import com.example.spring2023.Domain.models.Film;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

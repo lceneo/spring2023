@@ -1,6 +1,6 @@
 package com.example.spring2023.API;
 
-import com.example.spring2023.Domain.Services.FilmService;
+import com.example.spring2023.Application.Services.FilmService;
 import com.example.spring2023.Domain.models.Film;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

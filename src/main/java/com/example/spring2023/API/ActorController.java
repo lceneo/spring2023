@@ -1,6 +1,6 @@
 package com.example.spring2023.API;
 
-import com.example.spring2023.Domain.Services.ActorService;
+import com.example.spring2023.Application.Services.ActorService;
 import com.example.spring2023.Domain.models.Actor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

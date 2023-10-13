@@ -19,11 +19,11 @@ public final class ArchUnitTests {
                 .layeredArchitecture()
                 .consideringAllDependencies()
                 .layer("API").definedBy(PACKAGE_NAME + ".API..")
-                .layer("Domain").definedBy(PACKAGE_NAME + ".Domain..")
+                .layer("Application").definedBy(PACKAGE_NAME + ".Application..")
                 .layer("DAL").definedBy(PACKAGE_NAME + ".DAL..")
                 .whereLayer("API").mayNotBeAccessedByAnyLayer()
-                .whereLayer("Domain").mayOnlyBeAccessedByLayers("API")
-                .whereLayer("DAL").mayOnlyBeAccessedByLayers("Domain")
+                .whereLayer("Application").mayOnlyBeAccessedByLayers("API")
+                .whereLayer("DAL").mayOnlyBeAccessedByLayers("API","Application")
                 .check(CLASSES);
     }
 
