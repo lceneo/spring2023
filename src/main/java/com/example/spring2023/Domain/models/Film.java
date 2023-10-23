@@ -1,31 +1,27 @@
 package com.example.spring2023.Domain.models;
 
+import lombok.Getter;
+import org.springframework.lang.Nullable;
+
+import java.util.List;
+
+@Getter
 public class Film {
-    private int id;
+    @Nullable
+    private Long id;
     private String name;
     private int releaseYear;
+    @Nullable
+    private List<Long> actorsID;
 
-    public int getId() {
-        return id;
+    public void setActorsID(@Nullable List<Long> actorsID) {
+        this.actorsID = actorsID;
     }
 
-    public void setId(int id) {
+    public Film(@Nullable Long id, String name, int releaseYear, @Nullable List<Long> actorsID) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
-    }
-
-    public int getReleaseYear() {
-        return releaseYear;
-    }
-
-    public void setReleaseYear(int releaseYear) {
         this.releaseYear = releaseYear;
+        this.actorsID = actorsID;
     }
 }

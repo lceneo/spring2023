@@ -12,3 +12,9 @@ CREATE TABLE IF NOT EXISTS films (
     name TEXT NOT NULL,
     release_year INT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS actor_film (
+     actorID INTEGER NOT NULL,
+     filmID INTEGER NOT NULL,
+     PRIMARY KEY(actorID, filmID)
+);
