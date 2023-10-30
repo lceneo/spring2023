@@ -18,3 +18,13 @@ CREATE TABLE IF NOT EXISTS actor_film (
      filmID INTEGER NOT NULL,
      PRIMARY KEY(actorID, filmID)
 );
+
+CREATE TABLE IF NOT EXISTS _user (
+    id SERIAL PRIMARY KEY,
+    login text NOT NULL,
+    password TEXT NOT NULL,
+    email TEXT NOT NULL,
+    firstName TEXT NOT NULL,
+    secondName TEXT NOT NULL,
+    patronic TEXT NULL
+);

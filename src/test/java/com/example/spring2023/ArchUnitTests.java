@@ -21,9 +21,10 @@ public final class ArchUnitTests {
                 .layer("API").definedBy(PACKAGE_NAME + ".API..")
                 .layer("Application").definedBy(PACKAGE_NAME + ".Application..")
                 .layer("DAL").definedBy(PACKAGE_NAME + ".DAL..")
-                .whereLayer("API").mayNotBeAccessedByAnyLayer()
-                .whereLayer("Application").mayOnlyBeAccessedByLayers("API")
-                .whereLayer("DAL").mayOnlyBeAccessedByLayers("API","Application")
+                .layer("config").definedBy(PACKAGE_NAME + ".config..")
+                .whereLayer("API").mayOnlyBeAccessedByLayers("config")
+                .whereLayer("Application").mayOnlyBeAccessedByLayers("API", "config")
+                .whereLayer("DAL").mayOnlyBeAccessedByLayers("API","Application", "config")
                 .check(CLASSES);
     }
 

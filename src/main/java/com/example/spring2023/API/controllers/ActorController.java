@@ -1,4 +1,4 @@
-package com.example.spring2023.API;
+package com.example.spring2023.API.controllers;
 
 import com.example.spring2023.Domain.DTO.RequestDTO.ActorRequestDTO;
 import com.example.spring2023.Domain.DTO.ResponseDTO.ActorResponseDTO;
