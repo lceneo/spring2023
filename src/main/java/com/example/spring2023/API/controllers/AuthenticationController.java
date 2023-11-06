@@ -5,6 +5,7 @@ import com.example.spring2023.Domain.DTO.RequestDTO.AuthenticationRequest;
 import com.example.spring2023.Domain.DTO.RequestDTO.RegisterRequest;
 import com.example.spring2023.Domain.DTO.ResponseDTO.AuthenticationResponse;
 import com.example.spring2023.Domain.services.IAuthenticationService;
+import com.example.spring2023.Domain.services.IMailSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
 
     private final IAuthenticationService authenticationService;
+
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
     @RequestBody RegisterRequest request

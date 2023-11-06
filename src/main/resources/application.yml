@@ -9,6 +9,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: smtp.yandex.ru
+    username: nikita.karpinskiyy
+    password: NNN12322nnn
+    port: 465
+    protocol: smtps
 
 spring.profiles.active: development
 
