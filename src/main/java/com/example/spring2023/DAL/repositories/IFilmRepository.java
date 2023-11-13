@@ -25,6 +25,7 @@ public interface IFilmRepository extends CrudRepository<Film, Long> {
     @Query("UPDATE films SET name = :name, release_year = :releaseYear WHERE id = :id RETURNING id, name, release_year")
     Film update(Long id, String name, int releaseYear);
 
+
     @Override
     @Modifying
     @Query("DELETE FROM films WHERE id = :id")

@@ -28,3 +28,15 @@ CREATE TABLE IF NOT EXISTS _user (
     secondName TEXT NOT NULL,
     patronic TEXT NULL
 );
+
+CREATE TABLE IF NOT EXISTS user_favorite_actors (
+     userID INTEGER NOT NULL,
+     actorID INTEGER NOT NULL,
+     PRIMARY KEY (userID, actorID)
+);
+
+CREATE TABLE IF NOT EXISTS user_favorite_films (
+     userID INTEGER NOT NULL,
+     filmID INTEGER NOT NULL,
+     PRIMARY KEY (userID, filmID)
+);

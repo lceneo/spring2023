@@ -12,6 +12,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService implements IAuthenticationService {
@@ -49,5 +51,9 @@ public class AuthenticationService implements IAuthenticationService {
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
+    }
+
+    public Optional<User> getUserByLogin(String login) {
+        return this.userRepository.findByLogin(login);
     }
 }

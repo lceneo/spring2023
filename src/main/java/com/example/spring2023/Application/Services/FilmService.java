@@ -1,14 +1,14 @@
 package com.example.spring2023.Application.Services;
 
 import com.example.spring2023.Domain.DTO.RequestDTO.FilmRequestDTO;
-import com.example.spring2023.Application.Mappers.Response.FilmResponseDTOMapper;
-import com.example.spring2023.Domain.mappers.Request.IFilmRequestDTOMapper;
 import com.example.spring2023.Domain.models.Actor;
 import com.example.spring2023.Domain.models.Film;
 import com.example.spring2023.DAL.repositories.IActorRepository;
 import com.example.spring2023.DAL.repositories.IFilmActorRepository;
 import com.example.spring2023.DAL.repositories.IFilmRepository;
+import com.example.spring2023.Domain.services.IAuthenticationService;
 import com.example.spring2023.Domain.services.IFilmService;
+import com.example.spring2023.Domain.services.IJWTService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -25,25 +25,18 @@ public class FilmService implements IFilmService {
     private final IFilmRepository filmRepository;
     private final IActorRepository actorRepository;
     private final IFilmActorRepository filmActorRepository;
-    private final IFilmRequestDTOMapper filmRequestDTOMapper;
 
-    private final FilmResponseDTOMapper filmResponseDTOMapper;
     @Autowired
     public FilmService(
             IFilmRepository filmRepository,
             IActorRepository actorRepository,
-            IFilmActorRepository filmActorRepository,
-            IFilmRequestDTOMapper filmRequestDTOMapper,
-            FilmResponseDTOMapper filmResponseDTOMapper) {
+            IFilmActorRepository filmActorRepository) {
         this.filmRepository = filmRepository;
         this.actorRepository = actorRepository;
         this.filmActorRepository = filmActorRepository;
-        this.filmRequestDTOMapper = filmRequestDTOMapper;
-        this.filmResponseDTOMapper = filmResponseDTOMapper;
     }
 
     public SimpleEntry<Film, List<Actor>> createOrUpdateFilm(FilmRequestDTO film) {
-        var mappedFilm = this.filmRequestDTOMapper.apply(film);
         Film updatedOrCreatedFilm;
 
         if (film.getId() != null)
@@ -78,6 +71,6 @@ public class FilmService implements IFilmService {
 
     public void deleteFilm(Long id) {
         this.filmRepository.deleteById(id);
-        this.filmActorRepository.getAllFilmActors(id);
+        this.filmActorRepository.deleteFilmActors(id);
     }
 }
