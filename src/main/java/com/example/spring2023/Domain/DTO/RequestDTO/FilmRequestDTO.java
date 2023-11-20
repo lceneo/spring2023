@@ -10,6 +10,10 @@ public class FilmRequestDTO {
     private Long id;
     @Getter
     private String name;
+    
+    @Getter
+    private String genre;
+
     @Getter
     private int releaseYear;
     @Nullable

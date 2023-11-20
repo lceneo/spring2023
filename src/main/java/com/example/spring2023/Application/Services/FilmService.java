@@ -6,16 +6,13 @@ import com.example.spring2023.Domain.models.Film;
 import com.example.spring2023.DAL.repositories.IActorRepository;
 import com.example.spring2023.DAL.repositories.IFilmActorRepository;
 import com.example.spring2023.DAL.repositories.IFilmRepository;
-import com.example.spring2023.Domain.services.IAuthenticationService;
 import com.example.spring2023.Domain.services.IFilmService;
-import com.example.spring2023.Domain.services.IJWTService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
 import java.util.List;
 
 @Transactional
@@ -40,9 +37,9 @@ public class FilmService implements IFilmService {
         Film updatedOrCreatedFilm;
 
         if (film.getId() != null)
-            updatedOrCreatedFilm = this.filmRepository.update(film.getId(), film.getName(), film.getReleaseYear());
+            updatedOrCreatedFilm = this.filmRepository.update(film.getId(), film.getName(), film.getGenre(), film.getReleaseYear());
         else
-            updatedOrCreatedFilm = this.filmRepository.saveFilm(film.getName(), film.getReleaseYear());
+            updatedOrCreatedFilm = this.filmRepository.saveFilm(film.getName(), film.getGenre(), film.getReleaseYear());
 
         if (film.getActorsID() != null && !film.getActorsID().isEmpty()) {
             film.getActorsID()
@@ -51,9 +48,15 @@ public class FilmService implements IFilmService {
         }
         return new SimpleEntry<>(updatedOrCreatedFilm, this.actorRepository.findAll());
     }
-    public SimpleEntry<List<Film>, List<Actor>> getFilms(@Nullable String name) {
-        var queryResult = name != null ? this.filmRepository.findBySubstring(name) : this.filmRepository.findAll();
-        var films = new ArrayList<>(queryResult);
+    public SimpleEntry<List<Film>, List<Actor>> getFilms(@Nullable String name, @Nullable String genre, @Nullable Integer releaseYear) {
+        var films = this.filmRepository.findAll()
+                .stream()
+                .filter(film ->
+                        film.getName().toLowerCase().contains(name != null ? name.toLowerCase() : "") &&
+                        (genre == null || film.getGenre().equalsIgnoreCase(genre)) &&
+                        (releaseYear == null || film.getReleaseYear() == releaseYear))
+                .toList();
+
         films.forEach(film -> {
              var filmActors = this.filmActorRepository.getAllFilmActors(film.getId());
              film.setActorsID(filmActors);

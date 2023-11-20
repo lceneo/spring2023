@@ -19,7 +19,7 @@ public interface IFilmService {
      * @param name - search query to filter films with
      * @return - list of films that satisfy given criteria
      */
-    SimpleEntry<List<Film>, List<Actor>> getFilms(@Nullable String name);
+    SimpleEntry<List<Film>, List<Actor>> getFilms(@Nullable String name, @Nullable String genre, @Nullable Integer releaseYear);
 
     /**
      * Get Film by ID

@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS actors (
 CREATE TABLE IF NOT EXISTS films (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
+    genre TEXT NOT NULL,
     release_year INT NOT NULL
 );
 

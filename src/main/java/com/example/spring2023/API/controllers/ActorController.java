@@ -23,9 +23,10 @@ public class ActorController {
 
     @GetMapping
     public List<ActorResponseDTO> actors(
-            @RequestParam @Nullable String name
+            @RequestParam @Nullable String name,
+            @RequestParam @Nullable Integer age
     ) {
-        return this.actorService.getActors(name)
+        return this.actorService.getActors(name, age)
                 .stream()
                 .map(this.actorResponseDTOMapper::apply)
                 .toList();

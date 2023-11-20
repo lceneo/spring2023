@@ -19,7 +19,7 @@ public interface IActorService {
      * @param name - substring to search actors with
      * @return the list of suitable actors
      */
-    List<Actor> getActors(@Nullable String name);
+    List<Actor> getActors(@Nullable String name, @Nullable Integer age);
 
     /**
      * Get Actor from DB by ID

@@ -24,9 +24,11 @@ public class FilmController {
 
     @GetMapping
     public List<FilmResponseDTO> films(
-            @RequestParam @Nullable String name
+            @RequestParam @Nullable String name,
+            @RequestParam @Nullable String genre,
+            @RequestParam @Nullable Integer releaseYear
     ) {
-        var films = this.filmService.getFilms(name);
+        var films = this.filmService.getFilms(name, genre, releaseYear);
         return films.getKey().stream()
                 .map(film -> this.filmResponseDTOMapper.apply(film, films.getValue()))
                 .toList();

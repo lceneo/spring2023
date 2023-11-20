@@ -13,6 +13,7 @@ public class FilmRequestDTOMapper implements IFilmRequestDTOMapper {
         return new Film(
                 filmRequestDTO.getId(),
                 filmRequestDTO.getName(),
+                filmRequestDTO.getGenre(),
                 filmRequestDTO.getReleaseYear(),
                 filmRequestDTO.getActorsID()
         );

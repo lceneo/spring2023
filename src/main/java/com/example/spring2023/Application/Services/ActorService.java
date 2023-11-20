@@ -30,13 +30,13 @@ public class ActorService implements IActorService {
             return this.actorRepository.update(mappedActor);
         return this.actorRepository.save(mappedActor);
     }
-    public List<Actor> getActors(@Nullable String name) {
-        var actors = new ArrayList<Actor>();
-        var queryResult = name != null ? this.actorRepository.findBySubstring(name) : this.actorRepository.findAll();
-        for (Actor actor: queryResult)
-            actors.add(actor);
-        return actors;
-
+    public List<Actor> getActors(@Nullable String name, @Nullable Integer age) {
+        return this.actorRepository.findAll()
+                .stream()
+                .filter(actor ->
+                        actor.getFullName().toLowerCase().contains(name != null ? name.toLowerCase() : "") &&
+                        (age == null || actor.getAge() == age)
+                ).toList();
     }
 
     public Actor getActorByID(Long id) {

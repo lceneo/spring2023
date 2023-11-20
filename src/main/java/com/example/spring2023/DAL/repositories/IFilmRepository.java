@@ -19,11 +19,11 @@ public interface IFilmRepository extends CrudRepository<Film, Long> {
     @Query("SELECT * FROM films f WHERE LOWER(f.name) LIKE LOWER(CONCAT('%',:name, '%'))")
     List<Film> findBySubstring(String name);
 
-    @Query("INSERT INTO films (name, release_year) VALUES (:name, :releaseYear) RETURNING id, name, release_year")
-    Film saveFilm(String name, int releaseYear);
+    @Query("INSERT INTO films (name, genre, release_year) VALUES (:name, :genre, :releaseYear) RETURNING id, name, genre, release_year")
+    Film saveFilm(String name, String genre, int releaseYear);
 
-    @Query("UPDATE films SET name = :name, release_year = :releaseYear WHERE id = :id RETURNING id, name, release_year")
-    Film update(Long id, String name, int releaseYear);
+    @Query("UPDATE films SET name = :name, genre = :genre, release_year = :releaseYear WHERE id = :id RETURNING id, name, release_year")
+    Film update(Long id, String name, String genre, int releaseYear);
 
 
     @Override
