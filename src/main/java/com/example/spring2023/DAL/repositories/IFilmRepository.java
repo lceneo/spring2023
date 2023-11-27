@@ -1,13 +1,20 @@
 package com.example.spring2023.DAL.repositories;
+import com.example.spring2023.Domain.models.Actor;
 import com.example.spring2023.Domain.models.Film;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.lang.Nullable;
+
 import java.util.List;
 import java.util.Optional;
 
 public interface IFilmRepository extends CrudRepository<Film, Long> {
 
+    @Query("SELECT * FROM films f WHERE ((:searchStr IS NULL OR LOWER(f.name) LIKE LOWER(CONCAT('%',:searchStr, '%')))" +
+            "AND (:genre IS NULL OR genre = :genre)" +
+            "AND (:releaseYear IS NULL OR release_year =:releaseYear))")
+    List<Film> findWithFilters(@Nullable String searchStr, @Nullable String genre, @Nullable Integer releaseYear);
     @Override
     @Query("SELECT * FROM films")
     List<Film> findAll();

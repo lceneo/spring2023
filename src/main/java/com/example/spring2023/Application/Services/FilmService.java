@@ -1,5 +1,6 @@
 package com.example.spring2023.Application.Services;
 
+import com.example.spring2023.Domain.DTO.RequestDTO.FilmFiltersRequestDTO;
 import com.example.spring2023.Domain.DTO.RequestDTO.FilmRequestDTO;
 import com.example.spring2023.Domain.models.Actor;
 import com.example.spring2023.Domain.models.Film;
@@ -8,6 +9,7 @@ import com.example.spring2023.DAL.repositories.IFilmActorRepository;
 import com.example.spring2023.DAL.repositories.IFilmRepository;
 import com.example.spring2023.Domain.services.IFilmService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,14 +50,8 @@ public class FilmService implements IFilmService {
         }
         return new SimpleEntry<>(updatedOrCreatedFilm, this.actorRepository.findAll());
     }
-    public SimpleEntry<List<Film>, List<Actor>> getFilms(@Nullable String name, @Nullable String genre, @Nullable Integer releaseYear) {
-        var films = this.filmRepository.findAll()
-                .stream()
-                .filter(film ->
-                        film.getName().toLowerCase().contains(name != null ? name.toLowerCase() : "") &&
-                        (genre == null || film.getGenre().equalsIgnoreCase(genre)) &&
-                        (releaseYear == null || film.getReleaseYear() == releaseYear))
-                .toList();
+    public SimpleEntry<List<Film>, List<Actor>> getFilms(FilmFiltersRequestDTO filters) {
+        var films = this.filmRepository.findWithFilters(filters.getSearchStr(), filters.getGenre(), filters.getReleaseYear());
 
         films.forEach(film -> {
              var filmActors = this.filmActorRepository.getAllFilmActors(film.getId());

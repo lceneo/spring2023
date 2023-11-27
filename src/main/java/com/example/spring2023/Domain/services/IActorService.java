@@ -1,4 +1,5 @@
 package com.example.spring2023.Domain.services;
+import com.example.spring2023.Domain.DTO.RequestDTO.ActorFiltersRequestDTO;
 import com.example.spring2023.Domain.DTO.RequestDTO.ActorRequestDTO;
 import com.example.spring2023.Domain.models.Actor;
 import org.springframework.lang.Nullable;
@@ -16,10 +17,10 @@ public interface IActorService {
 
     /**
      * Get All actors satisfying search query from DB
-     * @param name - substring to search actors with
+     * @param filters - subset of filters to use on actors list
      * @return the list of suitable actors
      */
-    List<Actor> getActors(@Nullable String name, @Nullable Integer age);
+    List<Actor> getActors(ActorFiltersRequestDTO filters);
 
     /**
      * Get Actor from DB by ID

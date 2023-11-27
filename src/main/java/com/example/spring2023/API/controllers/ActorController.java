@@ -1,5 +1,6 @@
 package com.example.spring2023.API.controllers;
 
+import com.example.spring2023.Domain.DTO.RequestDTO.ActorFiltersRequestDTO;
 import com.example.spring2023.Domain.DTO.RequestDTO.ActorRequestDTO;
 import com.example.spring2023.Domain.DTO.ResponseDTO.ActorResponseDTO;
 import com.example.spring2023.Domain.mappers.Response.IActorResponseDTOMapper;
@@ -22,11 +23,8 @@ public class ActorController {
     }
 
     @GetMapping
-    public List<ActorResponseDTO> actors(
-            @RequestParam @Nullable String name,
-            @RequestParam @Nullable Integer age
-    ) {
-        return this.actorService.getActors(name, age)
+    public List<ActorResponseDTO> actors(@Nullable ActorFiltersRequestDTO filters) {
+        return this.actorService.getActors(filters)
                 .stream()
                 .map(this.actorResponseDTOMapper::apply)
                 .toList();

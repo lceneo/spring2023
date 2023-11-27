@@ -1,5 +1,6 @@
 package com.example.spring2023.API.controllers;
 
+import com.example.spring2023.Domain.DTO.RequestDTO.FilmFiltersRequestDTO;
 import com.example.spring2023.Domain.DTO.RequestDTO.FilmRequestDTO;
 import com.example.spring2023.Domain.DTO.ResponseDTO.FilmResponseDTO;
 import com.example.spring2023.Application.Mappers.Response.FilmResponseDTOMapper;
@@ -23,12 +24,8 @@ public class FilmController {
     }
 
     @GetMapping
-    public List<FilmResponseDTO> films(
-            @RequestParam @Nullable String name,
-            @RequestParam @Nullable String genre,
-            @RequestParam @Nullable Integer releaseYear
-    ) {
-        var films = this.filmService.getFilms(name, genre, releaseYear);
+    public List<FilmResponseDTO> films(@Nullable FilmFiltersRequestDTO filters) {
+        var films = this.filmService.getFilms(filters);
         return films.getKey().stream()
                 .map(film -> this.filmResponseDTOMapper.apply(film, films.getValue()))
                 .toList();

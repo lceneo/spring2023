@@ -18,6 +18,7 @@ public class FilmResponseDTOMapper implements IFilmResponseDTOMapper {
                 film.getId(),
                 film.getName(),
                 film.getReleaseYear(),
+                film.getGenre(),
                 film.getActorsID() != null ? film.getActorsID()
                         .stream()
                         .map(id -> this.findActor(id, actors))

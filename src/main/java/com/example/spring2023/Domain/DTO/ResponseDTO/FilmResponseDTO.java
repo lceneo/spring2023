@@ -13,6 +13,9 @@ public class FilmResponseDTO {
     private String name;
     @Getter
     private int releaseYear;
+
+    @Getter
+    private String genre;
     @Nullable
     private List<Actor> actors;
 
@@ -26,10 +29,11 @@ public class FilmResponseDTO {
         return actors;
     }
 
-    public FilmResponseDTO(Long id, String name, int releaseYear, @Nullable List<Actor> actors) {
+    public FilmResponseDTO(Long id, String name, int releaseYear, String genre, @Nullable List<Actor> actors) {
         this.id = id;
         this.name = name;
         this.releaseYear = releaseYear;
+        this.genre = genre;
         this.actors = actors;
     }
 }

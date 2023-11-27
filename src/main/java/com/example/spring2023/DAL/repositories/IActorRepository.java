@@ -1,13 +1,19 @@
 package com.example.spring2023.DAL.repositories;
+import com.example.spring2023.Domain.DTO.RequestDTO.ActorFiltersRequestDTO;
 import com.example.spring2023.Domain.models.Actor;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.lang.Nullable;
+
 import java.util.List;
 import java.util.Optional;
 
  public interface IActorRepository extends CrudRepository<Actor, Long> {
 
+        @Query("SELECT * FROM actors a WHERE ((:searchStr IS NULL OR LOWER(CONCAT(a.name, a.surname, a.patronic)) LIKE LOWER(CONCAT('%',:searchStr, '%')))" +
+                "AND (:age IS NULL OR age = :age))")
+        List<Actor> findWithFilters(@Nullable String searchStr, @Nullable Integer age);
         @Override
         @Query("SELECT * FROM actors")
         List<Actor> findAll();

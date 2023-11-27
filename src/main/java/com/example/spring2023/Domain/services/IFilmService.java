@@ -1,4 +1,5 @@
 package com.example.spring2023.Domain.services;
+import com.example.spring2023.Domain.DTO.RequestDTO.FilmFiltersRequestDTO;
 import com.example.spring2023.Domain.DTO.RequestDTO.FilmRequestDTO;
 import com.example.spring2023.Domain.models.Actor;
 import com.example.spring2023.Domain.models.Film;
@@ -16,10 +17,10 @@ public interface IFilmService {
 
     /**
      * get all films from DB that satisfy given search query
-     * @param name - search query to filter films with
+     * @param filters - subset of filters to use on actors list
      * @return - list of films that satisfy given criteria
      */
-    SimpleEntry<List<Film>, List<Actor>> getFilms(@Nullable String name, @Nullable String genre, @Nullable Integer releaseYear);
+    SimpleEntry<List<Film>, List<Actor>> getFilms(FilmFiltersRequestDTO filters);
 
     /**
      * Get Film by ID
