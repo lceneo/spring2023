@@ -3,9 +3,10 @@ import com.example.spring2023.Domain.DTO.ResponseDTO.ActorResponseDTO;
 import com.example.spring2023.Domain.mappers.Response.IActorResponseDTOMapper;
 import com.example.spring2023.Domain.models.Actor;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-@Service
+@Component
 public class ActorResponseDTOMapper implements IActorResponseDTOMapper {
     public ActorResponseDTO apply(@Nullable Actor actor) {
         if (actor == null) {

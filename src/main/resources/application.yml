@@ -11,8 +11,8 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   mail:
     host: smtp.yandex.ru
-    username: nikita.karpinskiyy
-    password: NNN12322nnn
+    username: nikita.karpinskiyy@yandex.ru
+    password: admwvxzxelnbpemj
     port: 465
     protocol: smtps
 

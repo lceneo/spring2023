@@ -1,5 +1,4 @@
 package com.example.spring2023.Application.Services;
-
 import com.example.spring2023.Domain.DTO.RequestDTO.FilmFiltersRequestDTO;
 import com.example.spring2023.Domain.DTO.RequestDTO.FilmRequestDTO;
 import com.example.spring2023.Domain.models.Actor;
@@ -7,14 +6,14 @@ import com.example.spring2023.Domain.models.Film;
 import com.example.spring2023.DAL.repositories.IActorRepository;
 import com.example.spring2023.DAL.repositories.IFilmActorRepository;
 import com.example.spring2023.DAL.repositories.IFilmRepository;
-import com.example.spring2023.Domain.services.IFilmService;
+import com.example.spring2023.Domain.services.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayDeque;
 import java.util.List;
 
 @Transactional
@@ -25,14 +24,29 @@ public class FilmService implements IFilmService {
     private final IActorRepository actorRepository;
     private final IFilmActorRepository filmActorRepository;
 
+    private final IActorService actorService;
+
+    private final IUserPreferencesService userPreferencesService;
+
+    private final IUserService userService;
+    private final IMailSender mailSender;
+
     @Autowired
     public FilmService(
             IFilmRepository filmRepository,
             IActorRepository actorRepository,
-            IFilmActorRepository filmActorRepository) {
+            IFilmActorRepository filmActorRepository,
+            IActorService actorService,
+            IUserPreferencesService userPreferencesService,
+            IUserService userService,
+            IMailSender mailSender) {
         this.filmRepository = filmRepository;
         this.actorRepository = actorRepository;
         this.filmActorRepository = filmActorRepository;
+        this.actorService = actorService;
+        this.userPreferencesService = userPreferencesService;
+        this.userService = userService;
+        this.mailSender = mailSender;
     }
 
     public SimpleEntry<Film, List<Actor>> createOrUpdateFilm(FilmRequestDTO film) {
@@ -47,11 +61,13 @@ public class FilmService implements IFilmService {
             film.getActorsID()
                     .forEach(actorID -> this.filmActorRepository.insertData(actorID, updatedOrCreatedFilm.getId()));
             updatedOrCreatedFilm.setActorsID(film.getActorsID());
+            if (film.getId() == null) { this.sendNewFilmWithActorEmail(updatedOrCreatedFilm); }
         }
         return new SimpleEntry<>(updatedOrCreatedFilm, this.actorRepository.findAll());
     }
     public SimpleEntry<List<Film>, List<Actor>> getFilms(FilmFiltersRequestDTO filters) {
-        var films = this.filmRepository.findWithFilters(filters.getSearchStr(), filters.getGenre(), filters.getReleaseYear());
+        var films = this.filmRepository.findWithFilters(filters.getSearchStr(), filters.getGenre(), filters.getReleaseYear(),
+                filters.getSkip(), filters.getTake());
 
         films.forEach(film -> {
              var filmActors = this.filmActorRepository.getAllFilmActors(film.getId());
@@ -71,5 +87,28 @@ public class FilmService implements IFilmService {
     public void deleteFilm(Long id) {
         this.filmRepository.deleteById(id);
         this.filmActorRepository.deleteFilmActors(id);
+    }
+
+    private void sendNewFilmWithActorEmail(Film film) {
+        var users = this.userService.getUsers();
+        if (users.isEmpty()) { return; }
+        users.forEach(user -> {
+            var actorsFromPreferences = film.getActorsID()
+                    .stream()
+                    .filter(actorID -> this.userPreferencesService
+                            .getUserPreferences(user.getId()).get().getFavoriteActorsIDs().contains(actorID))
+                    .map(this.actorService::getActorByID)
+                    .toList();
+            if (actorsFromPreferences.isEmpty()) {
+                return;
+            }
+            this.mailSender.send(user.getEmail(), "New Film with beloved actors",
+                    String.format("A new film \"%s\" was released starring %s",
+                            film.getName(),
+                            String.join(", ", actorsFromPreferences
+                                    .stream()
+                                    .map(Actor::getFullName)
+                                    .toList())));
+        });
     }
 }

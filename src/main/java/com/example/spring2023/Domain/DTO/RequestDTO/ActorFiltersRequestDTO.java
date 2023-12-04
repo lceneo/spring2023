@@ -14,6 +14,23 @@ public class ActorFiltersRequestDTO {
      */
     @Nullable Integer age;
 
+    /**
+     * number of actors to skip from the resulted value
+     */
+    @Nullable Integer skip;
+    /**
+     * number of actors to take from the resulted value
+     */
+    @Nullable Integer take;
+
+    public void setSkip(@Nullable Integer skip) {
+        this.skip = skip;
+    }
+
+    public void setTake(@Nullable Integer take) {
+        this.take = take;
+    }
+
     public void setSearchStr(@Nullable String searchStr) {
         this.searchStr = searchStr;
     }

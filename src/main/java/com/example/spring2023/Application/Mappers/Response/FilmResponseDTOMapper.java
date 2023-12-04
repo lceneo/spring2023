@@ -5,11 +5,12 @@ import com.example.spring2023.Domain.mappers.Response.IFilmResponseDTOMapper;
 import com.example.spring2023.Domain.models.Actor;
 import com.example.spring2023.Domain.models.Film;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+@Component
 public class FilmResponseDTOMapper implements IFilmResponseDTOMapper {
 
     public FilmResponseDTO apply(@Nullable Film film, @Nullable List<Actor> actors) {

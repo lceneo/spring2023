@@ -22,6 +22,9 @@ public interface IUserRepository extends CrudRepository<UserDetails, Long> {
     @Query("SELECT * FROM _user WHERE id = :id")
     Optional<User> findByID(Long id);
 
+    @Query("SELECT * FROM _user")
+    List<User> getAll();
+
     @Query("INSERT INTO user_favorite_films (userID, filmID) VALUES (:userID, :filmID) ON CONFLICT DO NOTHING ")
     @Modifying
     void addFilmToFavorites(Long userID, Long filmID);

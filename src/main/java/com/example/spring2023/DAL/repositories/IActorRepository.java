@@ -12,8 +12,10 @@ import java.util.Optional;
  public interface IActorRepository extends CrudRepository<Actor, Long> {
 
         @Query("SELECT * FROM actors a WHERE ((:searchStr IS NULL OR LOWER(CONCAT(a.name, a.surname, a.patronic)) LIKE LOWER(CONCAT('%',:searchStr, '%')))" +
-                "AND (:age IS NULL OR age = :age))")
-        List<Actor> findWithFilters(@Nullable String searchStr, @Nullable Integer age);
+                "AND (:age IS NULL OR age = :age))" +
+                "OFFSET :skip LIMIT :take")
+        List<Actor> findWithFilters(@Nullable String searchStr, @Nullable Integer age,
+                                    @Nullable Integer skip, @Nullable Integer take);
         @Override
         @Query("SELECT * FROM actors")
         List<Actor> findAll();

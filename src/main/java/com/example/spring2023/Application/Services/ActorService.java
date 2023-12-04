@@ -30,7 +30,7 @@ public class ActorService implements IActorService {
         return this.actorRepository.save(mappedActor);
     }
     public List<Actor> getActors(ActorFiltersRequestDTO filters) {
-        return this.actorRepository.findWithFilters(filters.getSearchStr(), filters.getAge());
+        return this.actorRepository.findWithFilters(filters.getSearchStr(), filters.getAge(), filters.getSkip(), filters.getTake());
     }
 
     public Actor getActorByID(Long id) {

@@ -1,32 +1,37 @@
 package com.example.spring2023.API.controllers;
-import com.example.spring2023.Domain.models.UserPreferences;
-import com.example.spring2023.Domain.services.IUserService;
+import com.example.spring2023.Domain.DTO.ResponseDTO.UserPreferencesResponseDTO;
+import com.example.spring2023.Domain.mappers.Response.IUserPreferencesResponseDTOMapper;
+import com.example.spring2023.Domain.services.IUserPreferencesService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/profile")
 public class PreferencesController {
 
-    private final IUserService userService;
+    private final IUserPreferencesService userService;
+    private final IUserPreferencesResponseDTOMapper preferencesMapper;
 
-    public PreferencesController(IUserService userService) {
+    public PreferencesController(IUserPreferencesService userService,
+                                 IUserPreferencesResponseDTOMapper preferencesMapper) {
         this.userService = userService;
+        this.preferencesMapper = preferencesMapper;
     }
 
     @GetMapping("/My")
-    public UserPreferences getMyPreferences(
+    public UserPreferencesResponseDTO getMyPreferences(
             @RequestHeader("Authorization") String token
     ) {
-        return this.userService.getMyPreferences(token.substring(7));
+        return preferencesMapper.apply(Optional.ofNullable(this.userService.getMyPreferences(token.substring(7))));
     }
 
     @GetMapping("/{id}")
-    public Optional<UserPreferences> getMyPreferences(
+    public Optional<UserPreferencesResponseDTO> getUserPreferences(
             @PathVariable Long id)
         {
-        return this.userService.getUserPreferences(id);
+            return Optional.ofNullable(this.preferencesMapper.apply(this.userService.getUserPreferences(id)));
     }
 
     @PostMapping("/film")

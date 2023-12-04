@@ -13,18 +13,13 @@ public interface IFilmRepository extends CrudRepository<Film, Long> {
 
     @Query("SELECT * FROM films f WHERE ((:searchStr IS NULL OR LOWER(f.name) LIKE LOWER(CONCAT('%',:searchStr, '%')))" +
             "AND (:genre IS NULL OR genre = :genre)" +
-            "AND (:releaseYear IS NULL OR release_year =:releaseYear))")
-    List<Film> findWithFilters(@Nullable String searchStr, @Nullable String genre, @Nullable Integer releaseYear);
-    @Override
-    @Query("SELECT * FROM films")
-    List<Film> findAll();
-
+            "AND (:releaseYear IS NULL OR release_year =:releaseYear))" +
+            "OFFSET :skip LIMIT :take")
+    List<Film> findWithFilters(@Nullable String searchStr, @Nullable String genre,
+                               @Nullable Integer releaseYear, @Nullable Integer skip, @Nullable Integer take);
     @Override
     @Query("SELECT * FROM films f WHERE f.id = :id")
     Optional<Film> findById(Long id);
-
-    @Query("SELECT * FROM films f WHERE LOWER(f.name) LIKE LOWER(CONCAT('%',:name, '%'))")
-    List<Film> findBySubstring(String name);
 
     @Query("INSERT INTO films (name, genre, release_year) VALUES (:name, :genre, :releaseYear) RETURNING id, name, genre, release_year")
     Film saveFilm(String name, String genre, int releaseYear);
