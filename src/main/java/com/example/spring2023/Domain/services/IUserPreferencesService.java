@@ -8,10 +8,10 @@ import java.util.Optional;
 public interface IUserPreferencesService {
     /**
      *
-     * @param token userToken passed with a request
+     * @param user who made a request
      * @return preferences of current user
      */
-    UserPreferences getMyPreferences(String token);
+    UserPreferences getMyPreferences(User user);
 
     /**
      *
@@ -23,13 +23,28 @@ public interface IUserPreferencesService {
     /**
      *
      * @param filmID - ID of film to add to favorites
+     * @param user - user who made a request
      */
-    void addFilmToPreferences(Long filmID, String token);
+    void addFilmToPreferences(Long filmID, User user);
 
     /**
      *
-     * @param filmID - ID of actor to add to favorites
+     * @param actorID - ID of actor to add to favorites
+     * @param user - user who made a request
      */
-    void addActorToPreferences(Long filmID, String token);
+    void addActorToPreferences(Long actorID, User user);
 
+    /**
+     *
+     * @param filmID - ID of film to remove from preferences
+     * @param user - user who wants to remove film from preferences
+     */
+    void removeFilmFromPreferences(Long filmID, User user);
+
+    /**
+     *
+     * @param actorID - ID of actor to remove from preferences
+     * @param user - user who wants to remove actor from preferences
+     */
+    void removeActorFromPreferences(Long actorID, User user);
 }

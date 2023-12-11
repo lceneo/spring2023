@@ -1,6 +1,7 @@
 package com.example.spring2023.Application.Services;
 
 import com.example.spring2023.DAL.repositories.IUserRepository;
+import com.example.spring2023.Domain.models.User;
 import com.example.spring2023.Domain.models.UserPreferences;
 import com.example.spring2023.Domain.services.*;
 import org.springframework.stereotype.Service;
@@ -10,22 +11,16 @@ import java.util.Optional;
 @Service
 public class UserPreferencesPreferencesService implements IUserPreferencesService {
 
-    private final IUserService userService;
     private final IUserRepository userRepository;
-    private final IActorService actorService;
 
-    public UserPreferencesPreferencesService(IUserService userService,
-                                             IUserRepository userRepository,
-                                             IActorService actorService) {
-        this.userService = userService;
+    public UserPreferencesPreferencesService(
+                                             IUserRepository userRepository) {
         this.userRepository = userRepository;
-        this.actorService = actorService;
     }
 
-    public UserPreferences getMyPreferences(String token) {
-        var userID = this.userService.getUser(token).get().getId();
-        var films = this.userRepository.findFavoriteFilms(userID);
-        var actors = this.userRepository.findFavoriteActors(userID);
+    public UserPreferences getMyPreferences(User user) {
+        var films = this.userRepository.findFavoriteFilms(user.getId());
+        var actors = this.userRepository.findFavoriteActors(user.getId());
         return new UserPreferences(films, actors);
     }
 
@@ -39,13 +34,19 @@ public class UserPreferencesPreferencesService implements IUserPreferencesServic
         return Optional.empty();
     }
 
-    public void addFilmToPreferences(Long filmID, String token) {
-        var user = this.userService.getUser(token);
-        this.userRepository.addFilmToFavorites(user.get().getId(), filmID);
+    public void addFilmToPreferences(Long filmID, User user) {
+        this.userRepository.addFilmToFavorites(user.getId(), filmID);
     }
 
-    public void addActorToPreferences(Long actorID, String token) {
-        var user = this.userService.getUser(token);
-        this.userRepository.addActorToFavorites(user.get().getId(), actorID);
+    public void addActorToPreferences(Long actorID, User user) {
+        this.userRepository.addActorToFavorites(user.getId(), actorID);
+    }
+
+    public void removeFilmFromPreferences(Long filmID, User user) {
+        this.userRepository.removeFilmFromFavorites(user.getId(), filmID);
+    }
+
+    public void removeActorFromPreferences(Long actorID, User user) {
+        this.userRepository.removeActorFromFavorites(user.getId(), actorID);
     }
 }

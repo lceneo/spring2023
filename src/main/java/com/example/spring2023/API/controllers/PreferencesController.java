@@ -2,21 +2,24 @@ package com.example.spring2023.API.controllers;
 import com.example.spring2023.Domain.DTO.ResponseDTO.UserPreferencesResponseDTO;
 import com.example.spring2023.Domain.mappers.Response.IUserPreferencesResponseDTOMapper;
 import com.example.spring2023.Domain.services.IUserPreferencesService;
+import com.example.spring2023.Domain.services.IUserService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/profile")
 public class PreferencesController {
 
-    private final IUserPreferencesService userService;
+    private final IUserService userService;
+    private final IUserPreferencesService userPreferencesService;
     private final IUserPreferencesResponseDTOMapper preferencesMapper;
 
-    public PreferencesController(IUserPreferencesService userService,
+
+    public PreferencesController(IUserService userService, IUserPreferencesService userPreferencesService,
                                  IUserPreferencesResponseDTOMapper preferencesMapper) {
         this.userService = userService;
+        this.userPreferencesService = userPreferencesService;
         this.preferencesMapper = preferencesMapper;
     }
 
@@ -24,14 +27,17 @@ public class PreferencesController {
     public UserPreferencesResponseDTO getMyPreferences(
             @RequestHeader("Authorization") String token
     ) {
-        return preferencesMapper.apply(Optional.ofNullable(this.userService.getMyPreferences(token.substring(7))));
+        var user = this.userService.getUser(token.substring(7));
+        return user.map(value ->
+                this.preferencesMapper.apply((Optional.ofNullable(this.userPreferencesService.getMyPreferences(value)))))
+                .orElse(null);
     }
 
     @GetMapping("/{id}")
     public Optional<UserPreferencesResponseDTO> getUserPreferences(
             @PathVariable Long id)
         {
-            return Optional.ofNullable(this.preferencesMapper.apply(this.userService.getUserPreferences(id)));
+            return Optional.ofNullable(this.preferencesMapper.apply(this.userPreferencesService.getUserPreferences(id)));
     }
 
     @PostMapping("/film")
@@ -39,7 +45,8 @@ public class PreferencesController {
             Long filmID,
             @RequestHeader("Authorization") String token
     ) {
-        this.userService.addFilmToPreferences(filmID, token.substring(7));
+        var user = this.userService.getUser(token.substring(7));
+        user.ifPresent(value -> this.userPreferencesService.addFilmToPreferences(filmID, value));
     }
 
     @DeleteMapping("/film")
@@ -47,7 +54,8 @@ public class PreferencesController {
             Long filmID,
             @RequestHeader("Authorization") String token
     ) {
-
+        var user = this.userService.getUser(token.substring(7));
+        user.ifPresent(value -> this.userPreferencesService.removeFilmFromPreferences(filmID, value));
     }
 
     @PostMapping("/actor")
@@ -55,7 +63,8 @@ public class PreferencesController {
             Long actorID,
             @RequestHeader("Authorization") String token
     ) {
-        this.userService.addActorToPreferences(actorID, token.substring(7));
+        var user = this.userService.getUser(token.substring(7));
+        user.ifPresent(value -> this.userPreferencesService.addActorToPreferences(actorID, value));
     }
 
     @DeleteMapping("/actor")
@@ -63,6 +72,7 @@ public class PreferencesController {
             Long actorID,
             @RequestHeader("Authorization") String token
     ) {
-
+        var user = this.userService.getUser(token.substring(7));
+        user.ifPresent(value -> this.userPreferencesService.removeActorFromPreferences(actorID, user.get()));
     }
 }

@@ -33,6 +33,14 @@ public interface IUserRepository extends CrudRepository<UserDetails, Long> {
     @Modifying
     void addActorToFavorites(Long userID, Long actorID);
 
+    @Query("DELETE FROM user_favorite_films WHERE userid = :userID AND filmid = :filmID")
+    @Modifying
+    void removeFilmFromFavorites(Long userID, Long filmID);
+
+    @Query("DELETE FROM user_favorite_actors WHERE userid = :userID AND actorid = :actorID")
+    @Modifying
+    void removeActorFromFavorites(Long userID, Long actorID);
+
     @Query("SELECT actorid FROM user_favorite_actors WHERE userid = :userID")
     List<Long> findFavoriteActors(Long userID);
 
