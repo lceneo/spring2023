@@ -25,5 +25,12 @@ public class ActorRequestDTO {
         return patronic;
     }
 
+    public ActorRequestDTO(@Nullable Long id, String name, String surname, @Nullable String patronic, int age) {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.patronic = patronic;
+        this.age = age;
+    }
 }
 

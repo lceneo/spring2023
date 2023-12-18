@@ -6,15 +6,14 @@ import com.example.spring2023.Domain.models.Film;
 import com.example.spring2023.DAL.repositories.IActorRepository;
 import com.example.spring2023.DAL.repositories.IFilmActorRepository;
 import com.example.spring2023.DAL.repositories.IFilmRepository;
+import com.example.spring2023.Domain.models.User;
 import com.example.spring2023.Domain.services.*;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @Service
@@ -65,7 +64,7 @@ public class FilmService implements IFilmService {
         }
         return new SimpleEntry<>(updatedOrCreatedFilm, this.actorRepository.findAll());
     }
-    public SimpleEntry<List<Film>, List<Actor>> getFilms(FilmFiltersRequestDTO filters) {
+    public SimpleEntry<List<Film>, List<Actor>> getFilms(FilmFiltersRequestDTO filters, Optional<User> user) {
         var films = this.filmRepository.findWithFilters(filters.getSearchStr(), filters.getGenre(), filters.getReleaseYear(),
                 filters.getSkip(), filters.getTake());
 
@@ -73,6 +72,22 @@ public class FilmService implements IFilmService {
              var filmActors = this.filmActorRepository.getAllFilmActors(film.getId());
              film.setActorsID(filmActors);
         });
+
+        if (user.isPresent()) {
+            var favoriteFilmsIDs = this.userPreferencesService.getMyPreferences(user.get()).getFavoriteFilmsIDs();
+            films.sort((firstFilm, secondFilm) -> {
+                var firstFilmInPreferences = favoriteFilmsIDs.contains(firstFilm.getId());
+                var secondFilmInPreferences = favoriteFilmsIDs.contains(secondFilm.getId());
+
+                if (firstFilmInPreferences == secondFilmInPreferences) { return 0; }
+                else if (secondFilmInPreferences) { return 1; }
+                else { return -1; }
+            });
+        }
+
+        // к следующей домашке добавлю ещё сортировку по актёрам, снявшихся в фильме.
+        // Прост по тз итак уже всё сделано, так что приходится растягивать, да и тестов я написал в 2 раза больше, чем требовалось...
+
         return new SimpleEntry<>(films, this.actorRepository.findAll());
     }
 

@@ -28,4 +28,12 @@ public class FilmRequestDTO {
     public List<Long> getActorsID() {
         return actorsID;
     }
+
+    public FilmRequestDTO(@Nullable Long id, String name, String genre, int releaseYear, @Nullable List<Long> actorsID) {
+        this.id = id;
+        this.name = name;
+        this.genre = genre;
+        this.releaseYear = releaseYear;
+        this.actorsID = actorsID;
+    }
 }

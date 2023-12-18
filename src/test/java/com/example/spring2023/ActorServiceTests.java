@@ -1,72 +1,71 @@
 package com.example.spring2023;
-
+import com.example.spring2023.Application.Services.ActorService;
 import com.example.spring2023.DAL.repositories.IActorRepository;
+import com.example.spring2023.Domain.DTO.RequestDTO.ActorFiltersRequestDTO;
+import com.example.spring2023.Domain.DTO.RequestDTO.ActorRequestDTO;
+import com.example.spring2023.Domain.mappers.Request.IActorRequestDTOMapper;
 import com.example.spring2023.Domain.models.Actor;
-import com.example.spring2023.Domain.services.IActorService;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
-import static org.junit.Assert.*;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.List;
+import java.util.Optional;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@RunWith(MockitoJUnitRunner.class)
 public class ActorServiceTests {
 
-    @MockBean
+    @InjectMocks
+    private ActorService actorService;
+
+    @Mock
     private IActorRepository actorRepository;
+    @Mock
+    private IActorRequestDTOMapper actorRequestDTOMapper;
 
-    @Autowired
-    private IActorService actorService;
+    @Test()
+    public void createActor() {
+        var actorRequest = new ActorRequestDTO(null, "testName", "testSurname", "testPatronymic", 19);
+        var mappedActor = new Actor(null, actorRequest.getName(), actorRequest.getSurname(), actorRequest.getPatronic(), actorRequest.getAge());
 
-    private final List<Actor> actors = List.of(
-            new Actor(1L, "Nikita", "Osminin", "Borisovich", 19),
-            new Actor(2L, "Ekaterina", "Safonova", "Sergeevna", 20),
-            new Actor(3L, "Antoniy", "Yaskov", "Demodovich", 21),
-            new Actor(4L, "Nikita", "Karpinskiy", "Anatolievich", 12),
-            new Actor(5L, "Boris", "Lakin", "Dmitrevich", 32)
-    );
-
-    @Before
-    public void initRepository() {
-        Mockito.when(actorRepository.findAll()).thenReturn(actors);
+        Mockito.when(this.actorRequestDTOMapper.apply(actorRequest)).thenReturn(mappedActor);
+        this.actorService.createOrUpdateActor(actorRequest);
+        Mockito.verify(actorRepository).save(mappedActor);
     }
 
-    @Test
-    public void checkActorsSearchWithoutParams() {
-        var searchResult = this.actorService.getActors(null, null);
-        assertEquals(searchResult.size(), 5);
+    @Test()
+    public void updateActor() {
+        var actorRequest = new ActorRequestDTO(1L, "testName", "testSurname", "testPatronymic", 19);
+        var mappedActor = new Actor(1L, actorRequest.getName(), actorRequest.getSurname(), actorRequest.getPatronic(), actorRequest.getAge());
+
+        Mockito.when(this.actorRequestDTOMapper.apply(actorRequest)).thenReturn(mappedActor);
+        this.actorService.createOrUpdateActor(actorRequest);
+        Mockito.verify(actorRepository).update(mappedActor);
     }
 
-    @Test
-    public void checkActorsSearchWithAgeSpecified() {
-        var searchResult = this.actorService.getActors(null, 19);
-        var foundActor = this.actors.get(0);
-        assertEquals("actors number of age 19 don't match", searchResult.size(), 1);
-        assertEquals(searchResult.get(0), foundActor);
-    }
+    @Test()
+    public void getActors() {
+        var filters = new ActorFiltersRequestDTO(null, null, null, null);
 
-    @Test
-    public void checkActorsSearchWithNameSpecified() {
-        var searchResult = this.actorService.getActors("Nikita", null).toArray();
-        var foundActors = this.actors.stream().filter(actor -> actor.getFullName().contains("Nikita")).toArray();
-        assertEquals("actors number with name Nikita don't match", searchResult.length, 2);
-        assertArrayEquals(searchResult, foundActors);
+        this.actorService.getActors(filters, Optional.empty());
+        Mockito.verify(this.actorRepository).findWithFilters(filters.getSearchStr(), filters.getAge(), filters.getSkip(), filters.getTake());
     }
+    @Test()
+    public void getActorByID() {
+        var actorID = 1L;
 
-    @Test
-    public void checkActorsSearchWithNameAndAgeSpecified() {
-        var searchResult = this.actorService.getActors("Nikita", 12).toArray();
-        var foundActors = this.actors.stream().filter(actor -> actor.getFullName().contains("Nikita") && actor.getAge() == 12).toArray();
-        assertEquals("actors number with name Nikita and age 12 don't match", searchResult.length, 1);
-        assertArrayEquals(searchResult, foundActors);
+        this.actorService.getActorByID(actorID);
+        Mockito.verify(this.actorRepository).findById(actorID);
+
+    }
+    @Test()
+    public void deleteActor() {
+        var actorID = 1L;
+
+        this.actorService.deleteActor(actorID);
+        Mockito.verify(this.actorRepository).deleteById(actorID);
     }
 
 }

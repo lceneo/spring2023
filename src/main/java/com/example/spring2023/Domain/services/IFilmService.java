@@ -3,9 +3,11 @@ import com.example.spring2023.Domain.DTO.RequestDTO.FilmFiltersRequestDTO;
 import com.example.spring2023.Domain.DTO.RequestDTO.FilmRequestDTO;
 import com.example.spring2023.Domain.models.Actor;
 import com.example.spring2023.Domain.models.Film;
+import com.example.spring2023.Domain.models.User;
 import org.springframework.lang.Nullable;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
+import java.util.Optional;
 
 public interface IFilmService {
     /**
@@ -18,9 +20,10 @@ public interface IFilmService {
     /**
      * get all films from DB that satisfy given search query
      * @param filters - subset of filters to use on actors list
+     * @param user - user to take sort criteria from
      * @return - list of films that satisfy given criteria
      */
-    SimpleEntry<List<Film>, List<Actor>> getFilms(FilmFiltersRequestDTO filters);
+    SimpleEntry<List<Film>, List<Actor>> getFilms(FilmFiltersRequestDTO filters, Optional<User> user);
 
     /**
      * Get Film by ID

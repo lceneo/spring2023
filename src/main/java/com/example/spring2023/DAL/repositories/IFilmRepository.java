@@ -21,6 +21,10 @@ public interface IFilmRepository extends CrudRepository<Film, Long> {
     @Query("SELECT * FROM films f WHERE f.id = :id")
     Optional<Film> findById(Long id);
 
+    @Override
+    @Query("SELECT * FROM films")
+    List<Film> findAll();
+
     @Query("INSERT INTO films (name, genre, release_year) VALUES (:name, :genre, :releaseYear) RETURNING id, name, genre, release_year")
     Film saveFilm(String name, String genre, int releaseYear);
 

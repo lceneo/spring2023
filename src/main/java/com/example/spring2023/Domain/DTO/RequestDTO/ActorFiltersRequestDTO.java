@@ -39,8 +39,10 @@ public class ActorFiltersRequestDTO {
         this.age = age;
     }
 
-    public ActorFiltersRequestDTO(@Nullable String searchStr, @Nullable Integer age) {
+    public ActorFiltersRequestDTO(@Nullable String searchStr, @Nullable Integer age, @Nullable Integer skip, @Nullable Integer take) {
         this.searchStr = searchStr;
         this.age = age;
+        this.skip = skip;
+        this.take = take;
     }
 }

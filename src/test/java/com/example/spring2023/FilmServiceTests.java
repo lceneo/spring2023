@@ -1,89 +1,116 @@
 package com.example.spring2023;
-
+import com.example.spring2023.Application.Services.FilmService;
 import com.example.spring2023.DAL.repositories.IActorRepository;
+import com.example.spring2023.DAL.repositories.IFilmActorRepository;
 import com.example.spring2023.DAL.repositories.IFilmRepository;
+import com.example.spring2023.Domain.DTO.RequestDTO.FilmRequestDTO;
 import com.example.spring2023.Domain.models.Actor;
 import com.example.spring2023.Domain.models.Film;
-import com.example.spring2023.Domain.services.IActorService;
-import com.example.spring2023.Domain.services.IFilmService;
-import jakarta.validation.constraints.Max;
-import org.junit.Before;
+import com.example.spring2023.Domain.models.User;
+import com.example.spring2023.Domain.models.UserPreferences;
+import com.example.spring2023.Domain.services.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@RunWith(MockitoJUnitRunner.class)
 public class FilmServiceTests {
 
-    @MockBean
+    @InjectMocks
+    private FilmService filmService;
+
+    @Mock
     private IFilmRepository filmRepository;
 
-    @Autowired
-    private IFilmService filmService;
+    @Mock
+    private IActorRepository actorRepository;
 
-    private final List<Film> films = List.of(
-            new Film(1L, "Terrifier", "Horror", 2012, null),
-            new Film(2L, "Mog", "Thriller", 2007, null),
-            new Film(3L, "American Psycho", "Thriller", 2000, new ArrayList<>(List.of(1L,2L))),
-            new Film(4L, "Alive", "Drama", 1997, null),
-            new Film(5L, "Terrifier 2", "Horror", 1666, null)
-    );
+    @Mock
+    private IActorService actorService;
 
-    @Before
-    public void initRepository() {
-        Mockito.when(filmRepository.findAll()).thenReturn(films);
+    @Mock
+    private IFilmActorRepository filmActorRepository;
+
+    @Mock
+    private IUserService userService;
+
+    @Mock
+    private IUserPreferencesService userPreferencesService;
+
+    @Mock
+    private IMailSender mailSender;
+
+    @Test
+    public void createFilm() {
+        var film = new FilmRequestDTO( null, "testFilm", "testGenre", 2004, null);
+        this.filmService.createOrUpdateFilm(film);
+        Mockito.verify(filmRepository).saveFilm("testFilm", "testGenre", 2004);
     }
 
     @Test
-    public void checkFilmsSearchWithoutParams() {
-        var searchResult = this.filmService.getFilms(null, null, null);
-        assertEquals(searchResult.getKey().size(), 5);
+    public void updateFilm() {
+        var filmRequest = new FilmRequestDTO(1L, "testFilm", "testGenre", 2004, List.of(1L));
+        var existingFilm = new Film(1L, "testFilm", "testGenre", 2004, null);
+        Mockito.when(filmRepository.update(filmRequest.getId(), filmRequest.getName(), filmRequest.getGenre(), filmRequest.getReleaseYear()))
+                .thenReturn(existingFilm);
+
+        this.filmService.createOrUpdateFilm(filmRequest);
+        Mockito.verify(filmRepository).update(1L, "testFilm", "testGenre", 2004);
+        Mockito.verify(filmActorRepository).insertData(1L, 1L);
     }
 
     @Test
-    public void checkActorsSearchWithNameSpecified() {
-        var searchResult = this.filmService.getFilms("Terrifier", null, null);
-        var foundActors = this.films.stream().filter(film -> film.getName().toLowerCase().contains("terrifier")).toArray();
-        assertEquals("films with name Terrifier don't match", searchResult.getKey().size(), 2);
-        assertArrayEquals(searchResult.getKey().toArray(), foundActors);
+    public void updateFilmWithMailSender() {
+        var filmRequest = new FilmRequestDTO(null,"testFilm", "testGenre", 2004, List.of(1L));
+        var newFilm = new Film(1L, "testFilm", "testGenre", 2004, null);
+        var user = new User(1L, "testLog", "testPass", "testMail@mail.ru", "testName",
+                "testSurname", "testPatronymic");
+        var actor = new Actor(1L, "testName", "testSurname", "testPatronimyc", 19);
+        var preferences = new UserPreferences(List.of(), filmRequest.getActorsID());
+
+        Mockito.when(filmRepository.saveFilm(filmRequest.getName(), filmRequest.getGenre(), filmRequest.getReleaseYear()))
+                .thenReturn(newFilm);
+        Mockito.when(userService.getUsers()).thenReturn(List.of(user));
+        Mockito.when(userPreferencesService.getUserPreferences(user.getId())).thenReturn(Optional.of(preferences));
+        Mockito.when(actorService.getActorByID(filmRequest.getActorsID().get(0))).thenReturn(actor);
+
+        this.filmService.createOrUpdateFilm(filmRequest);
+        Mockito.verify(mailSender).send(user.getEmail(),
+               "New Film with beloved actors",
+               "A new film \"testFilm\" was released starring testSurname testName testPatronimyc");
     }
 
     @Test
-    public void checkActorsSearchWithGenreSpecified() {
-        var searchResult = this.filmService.getFilms(null, "drama", null);
-        var foundFilm = this.films.stream().filter(film -> film.getGenre().toLowerCase().contains("drama")).toArray()[0];
-        assertEquals("films with genre drama don't match", searchResult.getKey().size(), 1);
-        assertEquals(foundFilm, this.films.get(3));
+    public void getFilms() {
+        filmRepository.findWithFilters(null, null, null, null, null);
+        Mockito.verify(filmRepository).findWithFilters(null, null, null, null, null);
     }
 
     @Test
-    public void checkActorsSearchWithReleaseYearSpecified() {
-        var searchResult = this.filmService.getFilms(null, null, 2000);
-        var foundFilm = this.films.stream().filter(film -> film.getReleaseYear() == 2000).toArray()[0];
-        assertEquals("films with genre drama don't match", searchResult.getKey().size(), 1);
-        assertEquals(foundFilm, this.films.get(2));
+    public void getFilmByID() {
+        var filmID = 1L;
+        List<Long> actorsList = List.of();
+        var film = new Film(1L, "testName", "testGenre", 2004, actorsList);
+        Mockito.when(filmRepository.findById(filmID)).thenReturn(Optional.of(film));
+
+        this.filmService.getFilmByID(filmID);
+        Mockito.verify(filmRepository).findById(filmID);
+        Mockito.verify(filmActorRepository).getAllFilmActors(filmID);
     }
 
     @Test
-    public void checkActorsSearchWithAllParamsSpecified() {
-        var searchResult = this.filmService.getFilms("American Psycho", "Thriller", 2000);
-        var foundFilm = this.films.stream().filter(film ->
-                film.getName().toLowerCase().contains("american psycho") &&
-                film.getReleaseYear() == 2000
-                && film.getGenre().toLowerCase().equals("thriller")
-        ).toArray()[0];
-        assertEquals("films with genre drama don't match", searchResult.getKey().size(), 1);
-        assertEquals(foundFilm, this.films.get(2));
+    public void deleteByID() {
+        var filmID = 1L;
+        this.filmService.deleteFilm(filmID);
+
+        Mockito.verify(filmRepository).deleteById(filmID);
+        Mockito.verify(filmActorRepository).deleteFilmActors(filmID);
     }
+
 }
