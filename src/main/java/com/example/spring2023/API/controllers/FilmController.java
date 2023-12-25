@@ -1,5 +1,6 @@
 package com.example.spring2023.API.controllers;
 
+import com.example.spring2023.Application.utils.ErrorMessage;
 import com.example.spring2023.Domain.DTO.RequestDTO.FilmFiltersRequestDTO;
 import com.example.spring2023.Domain.DTO.RequestDTO.FilmRequestDTO;
 import com.example.spring2023.Domain.DTO.ResponseDTO.FilmResponseDTO;
@@ -7,7 +8,11 @@ import com.example.spring2023.Domain.mappers.Response.IFilmResponseDTOMapper;
 import com.example.spring2023.Domain.models.User;
 import com.example.spring2023.Domain.services.IFilmService;
 import com.example.spring2023.Domain.services.IUserService;
+import jakarta.validation.Valid;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,12 +25,15 @@ public class FilmController {
     private final IFilmService filmService;
     private final IFilmResponseDTOMapper filmResponseDTOMapper;
     private final IUserService userService;
+
+    private final ErrorMessage errorMessage;
     public FilmController(IFilmService filmService,
                           IFilmResponseDTOMapper filmResponseDTOMapper,
-                          IUserService userService) {
+                          IUserService userService, ErrorMessage errorMessage) {
         this.filmService = filmService;
         this.filmResponseDTOMapper = filmResponseDTOMapper;
         this.userService = userService;
+        this.errorMessage = errorMessage;
     }
 
     @GetMapping
@@ -49,12 +57,16 @@ public class FilmController {
         return this.filmResponseDTOMapper.apply(film.getKey(), film.getValue());
     }
     @PostMapping
-    public FilmResponseDTO films(
-            @RequestBody FilmRequestDTO film,
+    public ResponseEntity films(
+            @RequestBody @Valid FilmRequestDTO film,
+            BindingResult bindingResult,
             @RequestHeader(value = "Authorization", required = false) @Nullable String token
     ){
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(this.errorMessage.createErrorMessage(bindingResult));
+        }
         var filmTuple = this.filmService.createOrUpdateFilm(film);
-        return this.filmResponseDTOMapper.apply(filmTuple.getKey(), filmTuple.getValue());
+        return ResponseEntity.ok(this.filmResponseDTOMapper.apply(filmTuple.getKey(), filmTuple.getValue()));
     }
 
     @DeleteMapping("/{id}")
