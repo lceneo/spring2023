@@ -1,5 +1,4 @@
 package com.example.spring2023.API.controllers;
-
 import com.example.spring2023.Domain.DTO.RequestDTO.ActorFiltersRequestDTO;
 import com.example.spring2023.Domain.DTO.RequestDTO.ActorRequestDTO;
 import com.example.spring2023.Domain.DTO.ResponseDTO.ActorResponseDTO;
@@ -9,7 +8,6 @@ import com.example.spring2023.Domain.services.IActorService;
 import com.example.spring2023.Domain.services.IUserService;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
 

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,20 +75,16 @@ public class FilmService implements IFilmService {
         });
 
         if (user.isPresent()) {
-            var favoriteFilmsIDs = this.userPreferencesService.getMyPreferences(user.get()).getFavoriteFilmsIDs();
-            films.sort((firstFilm, secondFilm) -> {
-                var firstFilmInPreferences = favoriteFilmsIDs.contains(firstFilm.getId());
-                var secondFilmInPreferences = favoriteFilmsIDs.contains(secondFilm.getId());
+            var preferences = this.userPreferencesService.getMyPreferences(user.get());
+            var favoriteFilms = preferences
+                    .getFavoriteFilmsIDs()
+                    .stream()
+                    .map(id -> this.getFilmByID(id).getKey())
+                    .toList();
 
-                if (firstFilmInPreferences == secondFilmInPreferences) { return 0; }
-                else if (secondFilmInPreferences) { return 1; }
-                else { return -1; }
-            });
+            var favoriteActorsIDs = preferences.getFavoriteActorsIDs();
+            films.sort((firstFilm, secondFilm) -> this.compareFilms(firstFilm, secondFilm, favoriteFilms, favoriteActorsIDs));
         }
-
-        // к следующей домашке добавлю ещё сортировку по актёрам, снявшихся в фильме.
-        // Прост по тз итак уже всё сделано, так что приходится растягивать, да и тестов я написал в 2 раза больше, чем требовалось...
-
         return new SimpleEntry<>(films, this.actorRepository.findAll());
     }
 
@@ -125,5 +122,51 @@ public class FilmService implements IFilmService {
                                     .map(Actor::getFullName)
                                     .toList())));
         });
+    }
+
+    private int compareFilms(Film firstFilm, Film secondFilm, List<Film> favoriteFilms, List<Long> favoriteActorsIDs) {
+        var firstFilmScore = this.getSearchScoreForFilm(firstFilm, favoriteFilms, favoriteActorsIDs);
+        var secondFilmScore = this.getSearchScoreForFilm(secondFilm, favoriteFilms, favoriteActorsIDs);
+        return Double.compare(secondFilmScore, firstFilmScore);
+    }
+
+    /**
+     * get a score of specific film for filtration purposes.
+     * The sort logic is next:
+     *      MAX_VALUE if film presented in favorites,
+     *      + 100 if one of actors presented in favorites
+     *      + (filmGenrePreferencePercent) * 10
+     * @param film film to get score for
+     * @param favoriteFilms list of favorite films
+     * @param favoriteActorsIDs list of favorite actors ids
+     * @return score for specific film
+     */
+
+    private double getSearchScoreForFilm(Film film, List<Film> favoriteFilms, List<Long> favoriteActorsIDs) {
+        var currentScore = 0d;
+        var filmInPreferences = favoriteFilms
+                .stream()
+                .anyMatch(favoriteFilm -> favoriteFilm.getId() == film.getId());
+
+        if (filmInPreferences) { return Integer.MAX_VALUE; }
+
+        if (film.getActorsID() != null) {
+            for (var actorID : film.getActorsID()) {
+                if (currentScore > Integer.MAX_VALUE - 100) { break; }
+                else if (favoriteActorsIDs.contains(actorID)) { currentScore += 100; }
+            }
+        }
+
+        var favoriteFilmsWithSameGenreCount = favoriteFilms
+                .stream()
+                .filter(favoriteFilm -> favoriteFilm.getGenre() == film.getGenre())
+                .toList()
+                .size();
+        if (favoriteFilmsWithSameGenreCount > 0) {
+            var addScoreForGenre = 100 / ((double)favoriteFilms.size() / favoriteFilmsWithSameGenreCount) * 10;
+            if (currentScore <= Integer.MAX_VALUE - addScoreForGenre) { currentScore += addScoreForGenre; }
+        }
+
+        return currentScore;
     }
 }
